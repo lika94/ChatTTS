@@ -1,6 +1,10 @@
 import random
 from typing import Optional
 from time import sleep
+import os
+os.environ["PATH"] += os.pathsep + "/usr/local/bin"
+import shutil
+
 
 import gradio as gr
 
@@ -153,7 +157,7 @@ def refine_text(
             temperature=temperature,
             top_P=top_P,
             top_K=top_K,
-            manual_seed=text_seed_input,
+            manual_seed=int(text_seed_input),
         ),
         split_text=split_batch > 0,
     )
@@ -183,7 +187,7 @@ def generate_audio(
         temperature=temperature,
         top_P=top_P,
         top_K=top_K,
-        manual_seed=audio_seed_input,
+        manual_seed=int(audio_seed_input),
     )
 
     if sample_text_input and sample_audio_code_input:

@@ -7,15 +7,12 @@ now_dir = os.getcwd()
 sys.path.append(now_dir)
 
 import argparse
-
 import gradio as gr
-
 from funcs import *
 from ex import ex
 
 
 def main():
-
     with gr.Blocks() as demo:
         gr.Markdown("# ChatTTS WebUI")
         gr.Markdown("- **GitHub Repo**: https://github.com/2noise/ChatTTS")
@@ -45,9 +42,6 @@ def main():
                         type="filepath",
                         interactive=True,
                         show_label=False,
-                        waveform_options=gr.WaveformOptions(
-                            sample_rate=24000,
-                        ),
                         scale=1,
                     )
                 with gr.Tab(label="Sample Audio Code"):
@@ -170,13 +164,11 @@ def main():
             outputs=sample_audio_code_input,
         ).then(fn=lambda: gr.Info("Sampled Audio Code generated at another Tab."))
 
-        # 使用Gradio的回调功能来更新数值输入框
         voice_selection.change(
             fn=on_voice_change, inputs=voice_selection, outputs=audio_seed_input
         )
 
         generate_audio_seed.click(generate_seed, outputs=audio_seed_input)
-
         generate_text_seed.click(generate_seed, outputs=text_seed_input)
 
         audio_seed_input.change(
@@ -189,19 +181,16 @@ def main():
 
         interrupt_button.click(interrupt_generate)
 
-        #@gr.render(inputs=[auto_play_checkbox, stream_mode_checkbox])
-        def make_audio(autoplay, stream):
+        # ✅ 关键修复：make_audio 写在 Blocks 内，并直接调用
+        def make_audio():
             audio_output = gr.Audio(
                 label="Output Audio",
                 value=None,
-                format="mp3" if use_mp3 and not stream else "wav",
-                autoplay=autoplay,
-                streaming=stream,
+                format="mp3" if use_mp3 else "wav",
+                autoplay=False,
+                streaming=False,
                 interactive=False,
                 show_label=True,
-                waveform_options=gr.WaveformOptions(
-                    sample_rate=24000,
-                ),
             )
             generate_button.click(
                 fn=set_buttons_before_generate,
@@ -240,6 +229,8 @@ def main():
                 outputs=[generate_button, interrupt_button],
             )
 
+        make_audio()  # ✅ 显式调用
+
         gr.Examples(
             examples=ex,
             inputs=[
@@ -254,9 +245,7 @@ def main():
         )
 
     parser = argparse.ArgumentParser(description="ChatTTS demo Launch")
-    parser.add_argument(
-        "--server_name", type=str, default="0.0.0.0", help="server name"
-    )
+    parser.add_argument("--server_name", type=str, default="0.0.0.0", help="server name")
     parser.add_argument("--server_port", type=int, default=8080, help="server port")
     parser.add_argument("--root_path", type=str, help="root path")
     parser.add_argument("--custom_path", type=str, help="custom model path")
@@ -280,7 +269,8 @@ def main():
         root_path=args.root_path,
         inbrowser=True,
         show_api=False,
-        share=True
+        share=True,
+        enable_queue=True,
     )
 
 
