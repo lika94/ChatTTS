@@ -189,7 +189,7 @@ def main():
 
         interrupt_button.click(interrupt_generate)
 
-        @gr.render(inputs=[auto_play_checkbox, stream_mode_checkbox])
+        #@gr.render(inputs=[auto_play_checkbox, stream_mode_checkbox])
         def make_audio(autoplay, stream):
             audio_output = gr.Audio(
                 label="Output Audio",
@@ -275,11 +275,12 @@ def main():
     dvae_coef_text.value = chat.coef
 
     demo.launch(
-        server_name=args.server_name,
-        server_port=args.server_port,
+        server_name="127.0.0.1",
+        server_port=7860,
         root_path=args.root_path,
         inbrowser=True,
         show_api=False,
+        share=True
     )
 
 
